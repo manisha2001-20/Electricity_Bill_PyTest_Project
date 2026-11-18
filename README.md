@@ -8,6 +8,8 @@ This project is a Python **Electricity Bill Calculator** with a **Streamlit** we
 
 > ⚠️ All tariff rates, surcharges and duties are **illustrative academic values** created for this project. They are **not** official electricity board rates.
 
+> **Group project.** Developed as an academic group project (Software Testing AAT); this repository is published from my GitHub account.
+
 ## 2. Problem Statement
 Electricity bills use slab-based (progressive) tariffs, and then add fixed charges, surcharges and taxes. Errors at slab edges (e.g. 100 vs 101 units), rounding mistakes in tax, or wrong handling of invalid input (negative units, text, empty values) produce incorrect bills. Manual checking is slow and error-prone, so the calculation must be verified by **automated, repeatable tests**, and every change must be re-checked (**regression testing**).
 
@@ -80,6 +82,13 @@ Every value is configured in one place: the `TARIFFS` dictionary in `bill_calcul
                     report_reader.py  ◄──── reports/ (junit XML, coverage JSON/HTML, HTML report, history)
 ```
 The business logic is kept out of the UI, so it can be unit-tested directly.
+
+### Workflow
+1. The user enters customer details, category and units in the Streamlit form.
+2. `validation.py` checks every input and raises a specific error for invalid values.
+3. `bill_calculator.py` computes slab-wise energy charges, then adds the fixed charge, fuel surcharge and electricity duty (rounded half-up to paise).
+4. The app shows the itemised bill summary.
+5. Separately, `pytest` runs the 210 tests, writes JUnit, coverage and HTML reports to `reports/`, and the Testing Dashboard reads those files.
 
 ## 7. Modules and Functionalities
 | Module | Main functions | Responsibility |
@@ -234,6 +243,11 @@ Coverage is measured on the logic modules. The Streamlit UI (`app.py`) is verifi
 
 ### Troubleshooting: `KeyError: 'fuel_surcharge_per_unit'`
 This error appears when a Streamlit server **started before the tariff upgrade** is still running. It keeps the old `bill_calculator` module in memory while showing the new `app.py`. Stop the server (`Ctrl+C`) and start it again. The configuration is now checked at startup by `check_tariff_config()`, and regression tests in `test_regression.py` and `test_app.py` fail if any tariff key is missing.
+
+## Limitations
+- Tariff rates, surcharges and duties are illustrative academic values, not official board rates.
+- Units must be whole kWh from 0 to 100,000; decimal readings are rejected by design.
+- 100% coverage is statement coverage of the three logic modules; `app.py` is checked by UI tests instead.
 
 ## 15. Conclusion
 The upgraded calculator adds configurable fuel surcharge and electricity duty with exact paise rounding, while keeping the original slab logic unchanged. The regression suite proves this. The system is verified by 210 automated PyTest cases across ten techniques, and all of them pass. Boundary value analysis covers every slab edge for both the energy charge and the final payable amount, and also very high consumption. Negative, equivalence and exception tests prove that invalid input is rejected with specific errors. Integration tests prove the validation and calculation modules work together safely. pytest-cov reports 100% statement coverage of the logic modules. The Streamlit Testing Dashboard shows these results directly from the real pytest output files, so nothing is fabricated.

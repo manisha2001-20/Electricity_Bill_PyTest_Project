@@ -65,6 +65,9 @@ Every value is configured in one place: the `TARIFFS` dictionary in `bill_calcul
 | **Category** | `Residential` or `Commercial`, case-insensitive. |
 
 ## 6. System Architecture
+
+![System architecture](docs/architecture.png)
+
 ```
  ┌───────────────────────────────┐  inputs   ┌────────────────────────┐ validated ┌──────────────────┐
  │ app.py (Streamlit)            │ ────────► │ bill_calculator.py     │ ◄──────── │ validation.py    │
@@ -234,3 +237,13 @@ This error appears when a Streamlit server **started before the tariff upgrade**
 
 ## 15. Conclusion
 The upgraded calculator adds configurable fuel surcharge and electricity duty with exact paise rounding, while keeping the original slab logic unchanged. The regression suite proves this. The system is verified by 210 automated PyTest cases across ten techniques, and all of them pass. Boundary value analysis covers every slab edge for both the energy charge and the final payable amount, and also very high consumption. Negative, equivalence and exception tests prove that invalid input is rejected with specific errors. Integration tests prove the validation and calculation modules work together safely. pytest-cov reports 100% statement coverage of the logic modules. The Streamlit Testing Dashboard shows these results directly from the real pytest output files, so nothing is fabricated.
+
+## Screenshots
+
+Bill Calculator tab:
+
+![Bill Calculator](docs/screenshots/calculator.png)
+
+Testing Dashboard tab (numbers read from the real pytest output in `reports/`):
+
+![Testing Dashboard](docs/screenshots/testing-dashboard.png)
